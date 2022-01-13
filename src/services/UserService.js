@@ -19,21 +19,20 @@ let handlUserLogin = (email, password) => {
                     let check = await bcrypt.compareSync(password, user.password);
                     if (check) {
                         userData.errCode = 0;
-                        userData.errMessage = 'OK';
+                        userData.message = 'OK';
                         delete user.password;
                         userData.user = user;
                     } else {
                         userData.errCode = 3;
-                        userData.errMessage = 'Wrong password';
+                        userData.message = 'Wrong password';
                     }
                 } else {
                     userData.errCode = 2;
-                    userData.errMessage = 'User not found'
+                    userData.message = 'User not found';
                 }
             } else {
                 userData.errCode = 1;
-                userData.errMessage = `Your's email doesn't exist. Pls try again`;
-
+                userData.message = 'Yours email doesnt exist. Pls try again';
             }
             resolve(userData);
         } catch (e) {
