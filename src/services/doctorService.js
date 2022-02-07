@@ -50,15 +50,32 @@ let getAllDoctors = () => {
     })
 }
 
+let checkRequiredFields = (data) => {
+    let arr = ['doctorId', 'contentHTML', 'contentMarkdown', 'action', 'selectedPrice', 'selectedPayment', 'selectedProvince',
+        'nameClinic', 'addressClinic', 'note', 'specialtyId']
+    let isValid = true;
+    let element = '';
+    for (let i = 0; i < arr.length; i++) {
+        if (!data[arr[i]]) {
+            isValid = false;
+            element = arr[i]
+            break;
+        }
+    }
+    return {
+        isValid: isValid,
+        element: element
+    }
+}
+
 let saveDetailInfoDoctor = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.doctorId || !data.contentHTML || !data.contentMarkdown || !data.action ||
-                !data.selectedPrice || !data.selectedPayment || !data.selectedProvince || !data.nameClinic ||
-                !data.addressClinic || !data.note) {
+            let checkObj = checkRequiredFields(data);
+            if (checkObj.isValid === false) {
                 resolve({
                     errCode: 1,
-                    errMessage: 'Missing parameter'
+                    errMessage: `Missing parameter ${checkObj.element}`
                 })
             } else {
                 //upsert to Markdown table
@@ -98,6 +115,8 @@ let saveDetailInfoDoctor = (data) => {
                     doctorInfo.nameClinic = data.nameClinic;
                     doctorInfo.addressClinic = data.addressClinic;
                     doctorInfo.note = data.note;
+                    doctorInfo.clinicId = data.clinicId;
+                    doctorInfo.specialtyId = data.specialtyId;
                     await doctorInfo.save();
                 } else {
                     await db.Doctor_info.create({
@@ -107,7 +126,9 @@ let saveDetailInfoDoctor = (data) => {
                         paymentId: data.selectedPayment,
                         nameClinic: data.nameClinic,
                         addressClinic: data.addressClinic,
-                        note: data.note
+                        note: data.note,
+                        specialtyId: data.specialtyId,
+                        clinicId: data.clinicId
                     })
                 }
                 resolve({
