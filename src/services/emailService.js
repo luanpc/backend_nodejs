@@ -21,6 +21,53 @@ let sendEmail = async (dataSend) => {
     });
 }
 
+let sendAttachment = async (dataSend) => {
+    let transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: process.env.EMAIL_APP, // generated ethereal user
+            pass: process.env.EMAIL_APP_PASSWORD, // generated ethereal password
+        },
+    });
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+        from: 'LuanPC" <luanpc2805@gmail.com>', // sender address
+        to: dataSend.email, // list of receivers
+        subject: "Kết quả đặt lịch khám bệnh", // Subject line
+        html: getBodyHTMLEmailRemedy(dataSend),
+        attachments: [
+            {
+                filename: `remedy-${dataSend.patientId}-${dataSend.patientName}.png`,
+                content: dataSend.imgBase64.split("base64,")[1],
+                encoding: 'base64'
+            }
+        ]
+    });
+}
+let getBodyHTMLEmailRemedy = (dataSend) => {
+    let result = ''
+    if (dataSend.language === 'vi') {
+        result = `
+        <h3>Xin chào ${dataSend.patientName}! </h3>
+        <p>Bạn nhận được email này đã đặt lịch khám bệnh online trên Booking Care</p>
+        <p>Thông tin đơn thuốc/hóa đơn được gửi trong file đính kèm: </p>
+
+        <div>Xin cảm ơn!</div>
+    `
+    }
+    if (dataSend.language === 'en') {
+        result = `
+        <h3>Dear ${dataSend.patientName}, </h3>
+        <p>You got to this email was set up the history of online on Booking Care</p>
+        <div>Thank you!</div>
+    `
+    }
+    return result;
+}
+
 let getBodyHTMLEmail = (dataSend) => {
     let result = ''
     if (dataSend.language === 'vi') {
@@ -60,5 +107,6 @@ let getBodyHTMLEmail = (dataSend) => {
     return result;
 }
 module.exports = {
-    sendEmail
+    sendEmail,
+    sendAttachment
 }

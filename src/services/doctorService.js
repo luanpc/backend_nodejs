@@ -1,7 +1,7 @@
 import db from '../models/index';
 require('dotenv').config();
 import _, { reject } from 'lodash';
-
+import emailService from '../services/emailService';
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
 let getTopDoctorHome = (limit) => {
@@ -421,10 +421,10 @@ let sendRemedy = (data) => {
                     await appointment.save()
                 }
                 //send email remedy
-
+                await emailService.sendAttachment(data)
                 resolve({
                     errCode: 0,
-                    data: data
+                    errMessage: 'OK'
                 })
             }
         } catch (error) {
